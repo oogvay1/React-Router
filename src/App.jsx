@@ -1,6 +1,5 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate, Routes, Route } from 'react-router-dom';
-import Lenis from 'lenis';
 import gsap from 'gsap';
 import { Home, About, Contact } from './Pages/Index';
 import './App.css';
@@ -8,15 +7,6 @@ import './App.css';
 export default function App() {
   const navigate = useNavigate();
   const location = useLocation();
-
-  useEffect(() => {
-    const lenis = new Lenis();
-    const raf = (time) => {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    };
-    requestAnimationFrame(raf);
-  }, []);
 
   useEffect(() => {
     revealTransition();
@@ -43,7 +33,7 @@ export default function App() {
         scaleY: 1,
         duration: 1,
         ease: 'power4.inOut',
-        stagger: 0.1,
+        stagger: .1,
         onComplete: resolve,
       });
     });
