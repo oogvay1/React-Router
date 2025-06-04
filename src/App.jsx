@@ -1,96 +1,110 @@
-import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom'
-import './App.css'
-import Lenis from 'lenis'
+import { useEffect } from 'react';
+import { useLocation, useNavigate, Routes, Route } from 'react-router-dom';
+import Lenis from 'lenis';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ScrollSmoother } from 'gsap/ScrollSmoother';
 import { Home, About, Contact } from './Pages/Index';
-import { useEffect, useRef, useState } from 'react';
+import './App.css';
 
-function App() {
+export default function App() {
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  const animRef = useRef(null);
+  useEffect(() => {
+    const lenis = new Lenis();
+    const raf = (time) => {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    };
+    requestAnimationFrame(raf);
+  }, []);
 
-  const lenis = new Lenis({
-    autoRaf: true,
-    smooth: true,
-    lerp: .1
-  });
+  useEffect(() => {
+    revealTransition();
+  }, [location.pathname]);
 
-  const animation_start = () => {
+  const revealTransition = () => {
+    gsap.set('.block', { scaleY: 1, transformOrigin: 'bottom' });
+    gsap.to('.block', {
+      scaleY: 0,
+      duration: 1,
+      ease: 'power4.inOut',
+      stagger: 0.1,
+    });
+  };
 
-    if (animRef.current) {
-      const aall = animRef.current.querySelectorAll('.animator1')
-      const all = animRef.current.querySelectorAll('.animator2');
-
-      aall.forEach(el => {
-        el.classList.remove('animation-active');
-        void animRef.current.offsetWidth;
-        el.classList.add('animation-active');
+  const animateTransition = () => {
+    return new Promise((resolve) => {
+      gsap.set('.block', {
+        scaleY: 0,
+        transformOrigin: 'top',
+        visibility: 'visible',
       });
+      gsap.to('.block', {
+        scaleY: 1,
+        duration: 1,
+        ease: 'power4.inOut',
+        stagger: 0.1,
+        onComplete: resolve,
+      });
+    });
+  };
 
-      all.forEach(el => {
-        el.classList.remove('animation-active-re');
-        void animRef.current.offsetWidth;
-        el.classList.add('animation-active-re');
-      })
+  const handleNavigation = async (path) => {
+    if (path !== location.pathname) {
+      await animateTransition();
+      navigate(path);
     }
-  }
+  };
 
   return (
     <>
-
-      <BrowserRouter>
-
-        <header className='header'>
-          <div className="container">
-
-            <div className="header-flex">
-              <div className="header-logo">
-                <h1>BraV<span>aa</span></h1>
+      <header className="header">
+        <div className="container">
+          <div className="header-flex">
+            <div className="header-logo">
+              <h1 onClick={() => handleNavigation('/')}>BraV<span>aa</span></h1>
+            </div>
+            <div className="header-main">
+              <nav className="nav">
+                <ul>
+                  <li onClick={() => handleNavigation('/')}>Home</li>
+                  <li onClick={() => handleNavigation('/about')}>About</li>
+                  <li onClick={() => handleNavigation('/contact')}>Contact</li>
+                </ul>
+              </nav>
+              <div className="header-search">
+                <p>|</p>
+                <p>En<i className="ri-arrow-drop-down-line"></i></p>
+                <i className="ri-search-2-line"></i>
+                <i className="ri-shopping-bag-3-line"></i>
               </div>
-
-              <div className="header-main">
-                <nav className='nav'>
-                  <ul>
-                    <li onClick={animation_start} ><NavLink to='/' >Home</NavLink></li>
-                    <li onClick={animation_start} ><NavLink to='/about' >About</NavLink></li>
-                    <li onClick={animation_start} ><NavLink to='/contact' >Contact</NavLink></li>
-                  </ul>
-                </nav>
-
-                <div className="header-search">
-                  <p>|</p>
-                  <p>En<i class="ri-arrow-drop-down-line"></i></p>
-                  <i class="ri-search-2-line"></i>
-                  <i class="ri-shopping-bag-3-line"></i>
-                </div>
-              </div>
-
             </div>
           </div>
+        </div>
+      </header>
 
-        </header>
+      <Routes location={location}>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+      </Routes>
 
-
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-        </Routes>
-
-      </BrowserRouter >
-
-      <div ref={animRef} className="animators">
-        <div className="animator1"></div>
-        <div className="animator2"></div>
-        <div className="animator1"></div>
-        <div className="animator2"></div>
-        <div className="animator1"></div>
+      <div className="transition">
+        <div className="transition-row row-1">
+          <div className="block"></div>
+          <div className="block"></div>
+          <div className="block"></div>
+          <div className="block"></div>
+          <div className="block"></div>
+        </div>
+        <div className="transition-row row-2">
+          <div className="block"></div>
+          <div className="block"></div>
+          <div className="block"></div>
+          <div className="block"></div>
+          <div className="block"></div>
+        </div>
       </div>
-
     </>
-  )
+  );
 }
-
-export default App
