@@ -18,7 +18,7 @@ export default function App() {
       scaleY: 0,
       duration: 1,
       ease: 'power4.inOut',
-      stagger: 0.1,
+      stagger: .1,
     });
   };
 
